@@ -77,7 +77,7 @@ This initial iteration will provide the minimum lovable product (MLP) including 
 returning a list of most compatible users within a given distance, and the ability to send, receive, and delete
 private messages.
 
-We will use API Gateway and Lambda to create six endpoints ('CreateProfile', 'UpdateProfile', 'GetSimilarUsers', 
+We will use API Gateway and Lambda to create seven endpoints ('CreateProfile', 'UpdateProfile', 'GetSimilarUsers', 
 'CreateNewMessage', 'GetInboxMessages', 'ReadMessage', and 'DeleteMessages') that will handle the creation and updating of user profiles,
 the retrieval of most compatible users, the creation of new messages, the retrieval of received messages, and the 
 deletion of messages to satisfy our requirements.
@@ -158,6 +158,29 @@ database.](images/example_design_document/UpdatePlaylistSD.png)
 
 * Accepts `GET` requests to `/users/:id/similar-users`
 * Accepts a user ID and returns a list of most similar users.
+    * If the optional `personalityType` parameter is provided, this API will 
+      return the list of similar users filtered by most compatible personality
+      types, based on the value of `personalityType`
+        * Analysts:
+          * INTJ
+          * INTP
+          * ENTJ
+          * ENTP
+        * Diplomats:
+          * INFJ
+          * INFP
+          * ENFJ
+          * ENFP
+        * Sentinels:
+          * ISTJ
+          * ISFJ
+          * ESTJ
+          * ESFJ
+        * Explorers:
+          * ISTP
+          * ISFP
+          * ESTP
+          * ESFP
 * If the given user ID is not found, will throw a `UserNotFoundException`
 
 ![Client sends submit playlist update form to Website Playlist page. Website
@@ -206,7 +229,7 @@ database.](images/example_design_document/UpdatePlaylistSD.png)
 ## 6.8 Delete Messages Endpoint
 
 * Accepts `PUT` request to `users/:id/inbox`
-* Accepts message IDs of messages to delete, returns updated list of messages
+* Accepts list of message IDs to delete, returns updated list of messages
 * If a message ID is not found, will throw `MessageNotFoundException`
 
 ![Client sends submit playlist update form to Website Playlist page. Website
