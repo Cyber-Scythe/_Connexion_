@@ -17,8 +17,8 @@ _List the most important questions you have about your design, or things that yo
  you might like help working through._
 
 1. Should users be filtered by their set location or by their current location?
-2. 
-3.
+2. How should the issue of blank "about me" sections be dealt with?
+3. 
 
 ---
 
@@ -64,10 +64,10 @@ _Clarify which parts of the problem you intend to solve. It helps reviewers know
 
 * blocking a user
 * Sending/receiving connection invitations
-* invitations to connect expire after 24 hours
+* invitations to connect expiring after 24 hours
 * returning a list of most compatible users that have not been previously connected with and that have not been 
   declined an invitation to connect
-* returning a list of most compatible users based on the users current location
+* returning a list of most compatible users based on the user's current location
 
 ---
 
@@ -77,8 +77,8 @@ This initial iteration will provide the minimum lovable product (MLP) including 
 returning a list of most compatible users within a given distance, and the ability to send, receive, and delete
 private messages.
 
-We will use API Gateway and Lambda to create seven endpoints ('CreateProfile', 'UpdateProfile', 'GetSimilarUsers', 
-'CreateNewMessage', 'GetInboxMessages', 'ReadMessage', and 'DeleteMessages') that will handle the creation and updating of user profiles,
+We will use API Gateway and Lambda to create eight endpoints ('LogIn', 'CreateProfile', 'UpdateProfile', 'GetSimilarUsers', 
+'CreateNewMessage', 'GetInboxMessages', and 'DeleteMessages') that will handle the creation and updating of user profiles,
 the retrieval of most compatible users, the creation of new messages, the retrieval of received messages, and the 
 deletion of messages to satisfy our requirements.
 
@@ -121,23 +121,33 @@ String messageContents;
 String readStatus;
 ```
 
-## 6.2. Create Profile Endpoint
+
+## 6.2. Log In Endpoint
+
+* Accepts `GET` request to `/users/:id`
+* Accepts an email address and password and returns the user's profile.
+* For security concerns, we will validate that the provided email is of the correct format and that the password
+  is correct.
+* If email address/password combination is incorrect, will throw `InvalidEmailPasswordCombinationException`
+
+![Client chooses to login with credentials or sign-up. Login page sends request to LoginActivity.
+LoginActivity checks credentials and if they're correct takes user to website homepage. If user 
+chooses 'sign-up' a new user ID will be created for the user and saved to DynamoDB](images/LogInSD.png)
+
+## 6.3. Create Profile Endpoint
 
 * Accepts `POST` requests to `/users`
-* Accepts data to create a new user profile with an id, a provided email, name, birthdate, location, list of hobbies, and an 
+* Accepts data to create a new user profile with an id, a provided email, name, birthdate, location, about me, and an 
   optional personality type. Returns the new user, including a unique user ID assigned by the Connexion Service.
 * For security concerns, we will validate the provided user information does not contain any invalid characters: 
   `" ' \`
 * If information fields contain any of the invalid characters, will throw an `InvalidAttributeValueException`.
 * If email address is already in use, will throw `ExistingAccountException`
 
-![Client sends submit playlist update form to Website Playlist page. Website
-playlist page sends an update request to UpdatePlaylistActivity.
-UpdatePlaylistActivity saves updates to the playlists
-database.](images/example_design_document/UpdatePlaylistSD.png)
+![...](images/CreateProfileSD.png)
 
 
-## 6.3 Update Profile Endpoint
+## 6.4 Update Profile Endpoint
 
 * Accepts `PUT` requests to `/users/:id`
 * Accepts data to update a user profile, including an email address, name, birthdate, location, list of hobbies, and 
@@ -147,14 +157,11 @@ database.](images/example_design_document/UpdatePlaylistSD.png)
   `" ' \`
 * If information fields contain any of the invalid characters, will throw an `InvalidAttributeValueException`.
 
-![Client sends submit playlist update form to Website Playlist page. Website
-playlist page sends an update request to UpdatePlaylistActivity.
-UpdatePlaylistActivity saves updates to the playlists
-database.](images/example_design_document/UpdatePlaylistSD.png)
+![...](images/CreateProfileSD.png)
 
 
 
-## 6.4 Get Similar Users Endpoint
+## 6.5 Get Similar Users Endpoint
 
 * Accepts `GET` requests to `/users/:id/similar-users`
 * Accepts a user ID and returns a list of most similar users.
@@ -183,47 +190,24 @@ database.](images/example_design_document/UpdatePlaylistSD.png)
           * ESFP
 * If the given user ID is not found, will throw a `UserNotFoundException`
 
-![Client sends submit playlist update form to Website Playlist page. Website
-playlist page sends an update request to UpdatePlaylistActivity.
-UpdatePlaylistActivity saves updates to the playlists
-database.](images/example_design_document/UpdatePlaylistSD.png)
+![...](images/GetSimilarUsersSD.png)
 
-
-## 6.5. Create New Message Endpoint
+## 6.6. Create New Message Endpoint
 
 * Accepts `POST` requests to `/users/:id/inbox/sent`
 * Accepts data to create a new private message, including a message ID, date and time sent, recipient, and message 
   content.
 * If body of message is blank, will throw `EmptyMessageException`
 
-![Client sends submit playlist update form to Website Playlist page. Website
-playlist page sends an update request to UpdatePlaylistActivity.
-UpdatePlaylistActivity saves updates to the playlists
-database.](images/example_design_document/UpdatePlaylistSD.png)
+![...](images/CreateNewMessageSD.png)
 
-
-## 6.6. Get Inbox Messages Endpoint
+## 6.7. Get Inbox Messages Endpoint
 
 * Accepts `GET` request to `/users/:id/inbox`
 * Accepts a user ID and returns a list of messages
 * If a give user ID is not found, will throw `UserNotFoundException`
 
-![Client sends submit playlist update form to Website Playlist page. Website
-playlist page sends an update request to UpdatePlaylistActivity.
-UpdatePlaylistActivity saves updates to the playlists
-database.](images/example_design_document/UpdatePlaylistSD.png)
-
-
-## 6.7 Read Message Endpoint
-
-* Accepts `GET` request to `/users/:id/inbox/:messageId
-* Accepts a message ID and returns the corresponding message
-* If a given message ID is not found, will throw `MessageNotFoundException`
-
-![Client sends submit playlist update form to Website Playlist page. Website
-playlist page sends an update request to UpdatePlaylistActivity.
-UpdatePlaylistActivity saves updates to the playlists
-database.](images/example_design_document/UpdatePlaylistSD.png)
+![...](images/GetMessagesSD.png)
 
 
 ## 6.8 Delete Messages Endpoint
@@ -232,11 +216,7 @@ database.](images/example_design_document/UpdatePlaylistSD.png)
 * Accepts list of message IDs to delete, returns updated list of messages
 * If a message ID is not found, will throw `MessageNotFoundException`
 
-![Client sends submit playlist update form to Website Playlist page. Website
-  playlist page sends an update request to UpdatePlaylistActivity.
-  UpdatePlaylistActivity saves updates to the playlists
-  database.](images/example_design_document/UpdatePlaylistSD.png)
-
+![...](images/DeleteMessagesSD.png)
 ---
 
 # 7. Tables
@@ -246,15 +226,16 @@ database.](images/example_design_document/UpdatePlaylistSD.png)
 ```
 id // partition key, string
 name // string
+email // string
 birthdate // string
 location // string
 profilePicture // string
 personalityType // string
-hobbies // stringSet
+aboutMe // string
 connections // stringSet
 ```
 
-### 7.2. `messages`
+### 7.2. `inbox`
 
 ```
 messageId // partition key, string
@@ -262,42 +243,28 @@ dateTimeSent // string
 sentBy // string
 receivedBy // string
 messageContent // string
-readStatus // string
+readStatus // boolean
 ```
 
 ---
 
 # 8. Pages
 
-_Include mock-ups of the web pages you expect to build. These can be as sophisticated as mockups/wireframes using 
- drawing software, or as simple as hand-drawn pictures that represent the key customer-facing components of the pages.
- It should be clear what the interactions will be on the page, especially where customers enter and submit data. You 
- may want to accompany the mockups with some description of behaviors of the page (e.g. “When customer submits the 
- submit-dog-photo button, the customer is sent to the doggie detail page”)_
 
-![Clicking on a playlist name on the home page opens the view playlist page.
-Clicking the plus icon on the homepage opens the create playlist page. Clicking
-the Create button on the create playlist page opens the view playlist page.
-Clicking the plus icon on the view playlist page opens the add song page.
-Clicking add on the Add Song page opens the view playlist
-page.](images/example_design_document/OverallWorkflow.png)
+![Login/sign-up page has options to either login or sign-up](images/Connexion_loginSignup.png)
 
-![The homepage has a header that reads "Amazon Playlists." It also displays the
-user's alias. Each page has this header. Each playlist the user has is shown as
-a box with the playlist name and any tags it has. There is also a plus
-icon.](images/example_design_document/Homepage.png)
+![The create profile page has a circular profile picture and an edit button to 
+change the photo, text boxes to edit all information, and a save button to save 
+changes.](images/Connexion_createProfile.png)
 
-![The create playlist page says "Create Playlist" with a field for name and
-tags. There is a "Create"
-button.](images/example_design_document/CreatePlaylist.png)
+![The homepage has a header that reads "Connexion" It also displays the
+user's name. Each page has this header. The header also contains a profile picture 
+icon that will take the user to edit their profile and a message icon that opens
+the user's inbox.](images/Connexion_homePage.png)
 
-![The view playlist page has the name of the playlist and any tags associated
-with it. Each song in the playlist is listed in order. There is a plus button
-to add a new song to the
-playlist.](images/example_design_document/ViewPlaylist.png)
 
-![The add song page has a form titled "Add Song." It displays the playlist name
-followed by fields for the asin and track number. THere is a check box for
-queue next. Finally, there is an "Add" button to submit the
-form.](images/example_design_document/AddSong.png)
+![The user profile page displays a user's profile picture and their information.
+Below the user's profile picture is a message icon that will allow a user to 
+send the user whom the profile belongs to a message.](images/Connexion_UserProfile.png)
+
 

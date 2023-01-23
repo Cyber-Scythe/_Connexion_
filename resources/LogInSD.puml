@@ -1,0 +1,18 @@
+@startuml
+'https://plantuml.com/sequence-diagram
+actor Client
+participant WebsiteLoginPage
+participant WebsiteHomePage
+participant DynamoDBLoginActivity
+database UsersTable
+autonumber
+
+Client -> WebsiteLoginPage: requests with URL
+WebsiteLoginPage -> DynamoDBLoginActivity: Authentication request getUser(email, password)
+DynamoDBLoginActivity -> WebsiteLoginPage: Authentication response
+DynamoDBLoginActivity -> UsersTable: get User from table
+UsersTable -> DynamoDBLoginActivity: returns User
+DynamoDBLoginActivity -> WebsiteHomePage: User
+WebsiteHomePage -> Client: User
+
+@enduml

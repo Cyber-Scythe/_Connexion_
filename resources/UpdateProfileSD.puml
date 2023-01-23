@@ -1,0 +1,12 @@
+@startuml
+'https://plantuml.com/sequence-diagram
+actor Client
+participant WebsiteProfilePage
+participant DynamoDBUpdateUserProfileActivity
+database UsersTable
+autonumber
+
+Client -> WebsiteProfilePage: submit profile update form
+WebsiteProfilePage -> DynamoDBUpdateUserProfileActivity: send update request
+DynamoDBUpdateUserProfileActivity -> UsersTable: save updates
+@enduml

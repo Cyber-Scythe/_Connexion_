@@ -1,0 +1,16 @@
+@startuml
+'https://plantuml.com/sequence-diagram
+actor Client
+participant WebsiteCreateProfilePage
+participant DynamoDBCreateUserActivity
+participant WebsiteHomePage
+database UsersTable
+autonumber
+
+Client -> WebsiteCreateProfilePage: Email and password
+WebsiteCreateProfilePage -> DynamoDBCreateUserActivity: createUser()
+DynamoDBCreateUserActivity -> UsersTable: Add new User to table
+UsersTable -> DynamoDBCreateUserActivity: User
+DynamoDBCreateUserActivity -> WebsiteHomePage: getHomePage()
+WebsiteHomePage -> Client: returns home page
+@enduml
