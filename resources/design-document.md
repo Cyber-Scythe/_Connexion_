@@ -231,7 +231,7 @@ birthdate // string
 location // string
 profilePicture // string
 personalityType // string
-aboutMe // string
+hobbies // stringSet
 connections // stringSet
 ```
 
@@ -248,7 +248,10 @@ readStatus // boolean
 
 ---
 
-# 8. Pages
+# 8. Class Diagram
+![...](images/ClassDiagram.png)
+---
+# 9. Pages
 
 
 ![Login/sign-up page has options to either login or sign-up](images/Connexion_loginSignup.png)
