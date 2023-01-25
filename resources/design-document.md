@@ -1,75 +1,273 @@
 # Design Document
 
-## Instructions
-
-_Replace italicized text (including this text!) with details of the design you are proposing for your team project. (Your replacement text shouldn't be in italics)._
-
-_You should take a look at the [example design document](example-design-document.md) in the same folder as this template for more guidance on the types of information to capture, and the level of detail to aim for._
-
-## _Project Title_ Design
+## Connexion Design
 
 ## 1. Problem Statement
 
-_Explain clearly what problem you are trying to solve._
+There are many ways today in which we can connect with new people, but something is missing from the equation. 
+People have a deep desire for genuine connection. Connexion is a service that matches users that are most compatible.
+Customers have the ability to send an invitation to connect with the desired user(s) and, if the invitation is
+accepted, can exchange messages.
+
+---
 
 ## 2. Top Questions to Resolve in Review
 
-_List the most important questions you have about your design, or things that you are still debating internally that you might like help working through._
+_List the most important questions you have about your design, or things that you are still debating internally that 
+ you might like help working through._
 
-1.
-2.
-3.
+1. Should users be filtered by their set location or by their current location?
+2. How should the issue of blank "about me" sections be dealt with?
+3. 
+
+---
 
 ## 3. Use Cases
 
-_This is where we work backwards from the customer and define what our customers would like to do (and why). You may also include use cases for yourselves (as developers), or for the organization providing the product to customers._
+<b>U1.</b> As a Connexion customer, I want to be able to create a profile containing information about me.
 
-U1. _As a [product] customer, I want to `<result>` when I `<action>`_
+<b>U2.</b> As a Connexion customer, I want to be able to update my profile information.
 
-U2. _As a [product] customer, I want to view my grocery list when I log into the grocery list page_
+<b>U3.</b> As a Connexion customer, I want to be able to view a list of the most compatible users within a certain 
+           distance from me and that I have not previously connected with.
 
-U3. ...
+<b>U4.</b> As a Connexion customer, I want to be able to send connection invitations to other users.
+
+<b>U5.</b> As a Connexion customer, I want to be able to receive connection invitations from other users.
+
+<b>U6.</b> As a Connexion customer, I want to be able to send and receive private messages.
+
+<b>7.</b> As a Connexion customer, I want to be able to delete private messages.
+
+<b>U8.</b> As a Connexion customer, I want to be able to block specific users from contacting me.
+
+<b>U9.</b> As a Connexion customer, I want to have the option to delete my profile.
+ 
+
+---
 
 ## 4. Project Scope
 
-_Clarify which parts of the problem you intend to solve. It helps reviewers know what questions to ask to make sure you are solving for what you say and stops discussions from getting sidetracked by aspects you do not intend to handle in your design._
+_Clarify which parts of the problem you intend to solve. It helps reviewers know what questions to ask to make sure 
+ you are solving for what you say and stops discussions from getting sidetracked by aspects you do not intend to handle
+ in your design._
 
 ### 4.1. In Scope
 
-_Which parts of the problem defined in Sections 1 and 2 will you solve with this design? This should include the base functionality of your product. What pieces are required for your product to work?_
+* creating and updating a user profile
+* returning a list of most compatible users that have not been previously connected with
+* sending and receiving private messages
+* deleting private messages
 
-_The functionality described above should be what your design is focused on. You do not need to include the design for any out of scope features or expansions._
 
 ### 4.2. Out of Scope
 
-_Based on your problem description in Sections 1 and 2, are there any aspects you are not planning to solve? Do potential expansions or related problems occur to you that you want to explicitly say you are not worrying about now? Feel free to put anything here that you think your team can't accomplish in the unit, but would love to do with more time._
+* blocking a user
+* Sending/receiving connection invitations
+* invitations to connect expiring after 24 hours
+* returning a list of most compatible users that have not been previously connected with and that have not been 
+  declined an invitation to connect
+* returning a list of most compatible users based on the user's current location
 
-_The functionality here does not need to be accounted for in your design._
+---
 
 # 5. Proposed Architecture Overview
 
-_Describe broadly how you are proposing to solve for the requirements you described in Section 2. This may include class diagram(s) showing what components you are planning to build. You should argue why this architecture (organization of components) is reasonable. That is, why it represents a good data flow and a good separation of concerns. Where applicable, argue why this architecture satisfies the stated requirements._
+This initial iteration will provide the minimum lovable product (MLP) including creating and updating a user profile,
+returning a list of most compatible users within a given distance, and the ability to send, receive, and delete
+private messages.
+
+We will use API Gateway and Lambda to create eight endpoints ('LogIn', 'CreateProfile', 'UpdateProfile', 'GetSimilarUsers', 
+'CreateNewMessage', 'GetInboxMessages', and 'DeleteMessages') that will handle the creation and updating of user profiles,
+the retrieval of most compatible users, the creation of new messages, the retrieval of received messages, and the 
+deletion of messages to satisfy our requirements.
+
+We will store user's and their profile information in a table in DynamoDB. Messages will also be stored in DynamoDB. 
+For retrieval of users that have not previously been connected with, we will store connections of each user in the 
+"Connections" table.
+
+Connexion will also provide a web interface for users to manage their profile. A main page providing a list view of 
+all the most compatible users will let them send private messages to the user(s) of their choosing. An inbox page will
+provide a list view of all received messages. 
+
+---
 
 # 6. API
 
 ## 6.1. Public Models
 
-_Define the data models your service will expose in its responses via your *`-Model`* package. These will be equivalent to the *`PlaylistModel`* and *`SongModel`* from the Unit 3 project._
+```
+// UserModel
 
-## 6.2. _First Endpoint_
+String id;
+String email;
+String name;
+String birthdate;
+String location;
+String profilePicture;
+String personalityType;
+List<String> hobbies;
+List<String> connections;
+```
 
-_Describe the behavior of the first endpoint you will build into your service API. This should include what data it requires, what data it returns, and how it will handle any known failure cases. You should also include a sequence diagram showing how a user interaction goes from user to website to service to database, and back. This first endpoint can serve as a template for subsequent endpoints. (If there is a significant difference on a subsequent endpoint, review that with your team before building it!)_
+```
+// MessageModel
 
-_(You should have a separate section for each of the endpoints you are expecting to build...)_
+String id;
+String sentBy;
+String receivedBy;
+String dateTimeSent;
+String messageContents;
+String readStatus;
+```
 
-## 6.3 _Second Endpoint_
 
-_(repeat, but you can use shorthand here, indicating what is different, likely primarily the data in/out and error conditions. If the sequence diagram is nearly identical, you can say in a few words how it is the same/different from the first endpoint)_
+## 6.2. Log In Endpoint
+
+* Accepts `GET` request to `/users/:id`
+* Accepts an email address and password and returns the user's profile.
+* For security concerns, we will validate that the provided email is of the correct format and that the password
+  is correct.
+* If email address/password combination is incorrect, will throw `InvalidEmailPasswordCombinationException`
+
+![Client chooses to login with credentials or sign-up. Login page sends request to LoginActivity.
+LoginActivity checks credentials and if they're correct takes user to website homepage. If user 
+chooses 'sign-up' a new user ID will be created for the user and saved to DynamoDB](images/LogInSD.png)
+
+## 6.3. Create Profile Endpoint
+
+* Accepts `POST` requests to `/users`
+* Accepts data to create a new user profile with an id, a provided email, name, birthdate, location, about me, and an 
+  optional personality type. Returns the new user, including a unique user ID assigned by the Connexion Service.
+* For security concerns, we will validate the provided user information does not contain any invalid characters: 
+  `" ' \`
+* If information fields contain any of the invalid characters, will throw an `InvalidAttributeValueException`.
+* If email address is already in use, will throw `ExistingAccountException`
+
+![...](images/CreateProfileSD.png)
+
+
+## 6.4 Update Profile Endpoint
+
+* Accepts `PUT` requests to `/users/:id`
+* Accepts data to update a user profile, including an email address, name, birthdate, location, list of hobbies, and 
+  optional personality type. Returns the updated user profile.
+* If the user ID is not found, will throw a `UserNotFoundException`
+* For security concerns, we will validate the provided user information does not contain any invalid characters:
+  `" ' \`
+* If information fields contain any of the invalid characters, will throw an `InvalidAttributeValueException`.
+
+![...](images/CreateProfileSD.png)
+
+
+
+## 6.5 Get Similar Users Endpoint
+
+* Accepts `GET` requests to `/users/:id/similar-users`
+* Accepts a user ID and returns a list of most similar users.
+    * If the optional `personalityType` parameter is provided, this API will 
+      return the list of similar users filtered by most compatible personality
+      types, based on the value of `personalityType`
+        * Analysts:
+          * INTJ
+          * INTP
+          * ENTJ
+          * ENTP
+        * Diplomats:
+          * INFJ
+          * INFP
+          * ENFJ
+          * ENFP
+        * Sentinels:
+          * ISTJ
+          * ISFJ
+          * ESTJ
+          * ESFJ
+        * Explorers:
+          * ISTP
+          * ISFP
+          * ESTP
+          * ESFP
+* If the given user ID is not found, will throw a `UserNotFoundException`
+
+![...](images/GetSimilarUsersSD.png)
+
+## 6.6. Create New Message Endpoint
+
+* Accepts `POST` requests to `/users/:id/inbox/sent`
+* Accepts data to create a new private message, including a message ID, date and time sent, recipient, and message 
+  content.
+* If body of message is blank, will throw `EmptyMessageException`
+
+![...](images/CreateNewMessageSD.png)
+
+## 6.7. Get Inbox Messages Endpoint
+
+* Accepts `GET` request to `/users/:id/inbox`
+* Accepts a user ID and returns a list of messages
+* If a give user ID is not found, will throw `UserNotFoundException`
+
+![...](images/GetMessagesSD.png)
+
+
+## 6.8 Delete Messages Endpoint
+
+* Accepts `PUT` request to `users/:id/inbox`
+* Accepts list of message IDs to delete, returns updated list of messages
+* If a message ID is not found, will throw `MessageNotFoundException`
+
+![...](images/DeleteMessagesSD.png)
+---
 
 # 7. Tables
 
-_Define the DynamoDB tables you will need for the data your service will use. It may be helpful to first think of what objects your service will need, then translate that to a table structure, like with the *`Playlist` POJO* versus the `playlists` table in the Unit 3 project._
+### 7.1. `users`
 
-# 8. Pages
+```
+id // partition key, string
+name // string
+email // string
+birthdate // string
+location // string
+profilePicture // string
+personalityType // string
+hobbies // stringSet
+connections // stringSet
+```
 
-_Include mock-ups of the web pages you expect to build. These can be as sophisticated as mockups/wireframes using drawing software, or as simple as hand-drawn pictures that represent the key customer-facing components of the pages. It should be clear what the interactions will be on the page, especially where customers enter and submit data. You may want to accompany the mockups with some description of behaviors of the page (e.g. “When customer submits the submit-dog-photo button, the customer is sent to the doggie detail page”)_
+### 7.2. `inbox`
+
+```
+messageId // partition key, string
+dateTimeSent // string
+sentBy // string
+receivedBy // string
+messageContent // string
+readStatus // boolean
+```
+
+---
+
+# 8. Class Diagram
+![...](images/ClassDiagram.png)
+---
+# 9. Pages
+
+
+![Login/sign-up page has options to either login or sign-up](images/Connexion_loginSignup.png)
+
+![The create profile page has a circular profile picture and an edit button to 
+change the photo, text boxes to edit all information, and a save button to save 
+changes.](images/Connexion_createProfile.png)
+
+![The homepage has a header that reads "Connexion" It also displays the
+user's name. Each page has this header. The header also contains a profile picture 
+icon that will take the user to edit their profile and a message icon that opens
+the user's inbox.](images/Connexion_homePage.png)
+
+
+![The user profile page displays a user's profile picture and their information.
+Below the user's profile picture is a message icon that will allow a user to 
+send the user whom the profile belongs to a message.](images/Connexion_UserProfile.png)
+
+

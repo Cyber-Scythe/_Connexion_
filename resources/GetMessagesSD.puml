@@ -1,0 +1,15 @@
+@startuml
+'https://plantuml.com/sequence-diagram
+actor Client
+participant WebsiteInboxPage
+participant DynamoDBInboxActivity
+database InboxTable
+autonumber
+
+Client -> WebsiteInboxPage: clicks Messages icon
+WebsiteInboxPage -> DynamoDBInboxActivity: getMessages(userId)
+DynamoDBInboxActivity -> InboxTable: get all messages for userId
+InboxTable -> DynamoDBInboxActivity: List<Message>
+DynamoDBInboxActivity -> WebsiteInboxPage: List<Message>
+WebsiteInboxPage -> Client: List<message>
+@enduml

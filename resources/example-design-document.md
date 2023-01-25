@@ -66,7 +66,7 @@ U8. As a customer, I want to view all playlists I've created.
 
 * Updating playlist tags
 * Integration with Amazon Music Client
-* When adding a song on the website, having a drop down or autocomplete with the
+* When adding a song on the website, having a drop-down or autocomplete with the
   different songs available.
 * The ability to play music from the website
 * The ability to search for existing songs either through the website or the API

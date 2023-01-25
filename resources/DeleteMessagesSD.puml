@@ -1,0 +1,15 @@
+@startuml
+'https://plantuml.com/sequence-diagram
+actor Client
+participant WebsiteInboxPage
+participant DynamoDBDeleteMessagesActivity
+database InboxTable
+autonumber
+
+Client -> WebsiteInboxPage:
+WebsiteInboxPage -> DynamoDBDeleteMessagesActivity: deleteMessages(List<Message>)
+DynamoDBDeleteMessagesActivity -> InboxTable: delete messages from table
+InboxTable -> DynamoDBDeleteMessagesActivity: List<Message>
+DynamoDBDeleteMessagesActivity -> WebsiteInboxPage: List<Message>
+WebsiteInboxPage -> Client: List<Message>
+@enduml

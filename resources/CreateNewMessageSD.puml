@@ -1,0 +1,14 @@
+@startuml
+'https://plantuml.com/sequence-diagram
+actor Client
+participant UserProfilePage
+participant DynamoDBCreateMessageActivity
+database InboxTable
+autonumber
+
+Client -> UserProfilePage: clicks message icon
+UserProfilePage -> DynamoDBCreateMessageActivity: createNewMessage(fromUserId, toUserId)
+DynamoDBCreateMessageActivity -> InboxTable: saves new message for toUserId in Inbox table
+InboxTable -> DynamoDBCreateMessageActivity: status message
+DynamoDBCreateMessageActivity -> Client: status message
+@enduml

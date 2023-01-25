@@ -1,0 +1,345 @@
+@startuml
+'https://plantuml.com/class-diagram'
+
+LoginLambda -- LoginActivity
+LoginActivity -- LoginDao
+CreateProfileLambda -- CreateProfileActivity
+CreateProfileActivity -- UserDao
+UpdateProfileLambda -- UpdateProfileActivity
+UpdateProfileActivity -- UserDao
+GetSimilarUsersLambda -- GetSimilarUsersActivity
+GetSimilarUsersActivity -- UserDao
+CreateNewMessageLambda -- CreateNewMessageActivity
+CreateNewMessageActivity -- MessageDao
+GetInboxMessagesLambda -- GetInboxMessagesActivity
+GetInboxMessagesActivity -- MessageDao
+DeleteMessagesLambda -- DeleteMessagesActivity
+DeleteMessagesActivity -- MessageDao
+
+
+
+class LoginDao {
+    DynamoDbMapper
+
+    logUserIn(String email, String password): UserModel
+}
+
+class MessageDao {
+    DynamoDbMapper
+
+    +getAllMessages(String email): List<MessageModel>
+    createNewMessage(MessageModel)
+    deleteMessages(List<MessageModel>)
+}
+
+class UserDao {
+    DynamoDbMapper
+
+    UserModel createProfile(UserModel)
+    +getUser(String email): UserModel
+    List<UserModel> getSimilarUsers(UserModel)
+}
+
+class MessageModel {
+    -String dateTimeSent
+    -String sentBy
+    -String receivedBy
+    -String messageContent
+    -boolean readStatus
+
+    +getDateTimeSent(): String
+    +setDateTimeSent(): void
+    +getSender(): String
+    +setSender(): void
+    +getRecipient(): String
+    +setRecipient(): void
+    +getMessageContent(): String
+    +setMessageContent(): void
+    +getReadStatus(): boolean
+    +setReadStatus(): void
+}
+class UserModel {
+    -String email
+    -String name
+    -String birthdate
+    -String location
+    -String profilePicture
+    -String personalityType
+    -List<String> hobbies
+
+    +setEmail(): void
+    +setName(): void
+    +setBirthdate(): void
+    +setLocation(): void
+    +setProfilePicture(): void
+    +setPersonalityType(): void
+    +setHobbies(): void
+
+    +getEmail(): String
+    +getName(): String
+    +getBirthdate(): String
+    +getLocation(): String
+    +getProfilePicture(): String
+    +getPersonalityType(): String
+    +getHobbies(): List<String>
+}
+class LoginActivity {
+    LoginDao
+
+    handleRequest(LoginRequest request): LoginActivityResult
+}
+class LoginActivityRequest {
+    - email: String
+    - password: String
+
+    -LoginActivityRequest(String email, String password)
+    +getEmail(): String
+    +getPassword(): String
+    +toString(): String
+    +builder(): Builder
+}
+
+class LoginActivityResult {
+    -UserModel userProfile
+
+    -LoginActivityResult(UserModel userProfile)
+    +getUserProfile(): UserModel
+    +toString(): String
+    +builder(): Builder
+}
+
+class LoginLambda {
+    String email[primary key]
+    String password
+
+    LambdaResponse handleRequest(AuthenticatedLambdaRequest<LoginActivityRequest>, Context)
+}
+
+class CreateProfileActivity {
+    UserDao
+
+    handleRequest(CreateProfileActivityRequest request): CreateProfileActivityResult
+}
+
+class CreateProfileActivityRequest {
+    -String email
+    -String name
+    -String birthdate
+    -String location
+    -String profilePicture
+    -String personalityType
+    -List<String> hobbies
+
+    +getEmail(): String
+    +getName(): String
+    +getBirthdate(): String
+    +getLocation(): String
+    +getProfilePicture(): String
+    +getPersonalityType(): String
+    +getHobbies(): List<String>
+    +toString(): String
+    +builder(): Builder
+
+    CreateProfileActivityRequest(String email, String name, String birthdate, String location, String profilePicture,
+                            String personalityType, List<String> hobbies): CreateProfileActivityResult
+}
+
+class CreateProfileActivityResult {
+    -UserModel userProfile
+
+    -CreateProfileActivityResult(UserModel userProfile)
+    +getUserProfile(): UserModel
+    +toString(): String
+    +builder(): Builder
+}
+
+class CreateProfileLambda {
+    UserModel userProfile
+
+    LambdaResponse handleRequest(AuthenticatedLambdaRequest<CreateProfileActivityRequest>, Context)
+}
+
+class UpdateProfileActivity {
+    -UserDao userDao
+
+    +UpdateProfileActivity()
+    +handleRequest(UpdateProfileActivityRequest request): UpdateProfileActivityResult
+}
+
+class UpdateProfileActivityRequest {
+   -String email
+   -String name
+   -String birthdate
+   -String location
+   -String profilePicture
+   -String personalityType
+   -List<String> hobbies
+
+    UpdateProfileActivityRequest(String email, String name, String birthdate, String location, String profilePicture,
+                            String personalityType, List<String> hobbies): UpdateProfileActivityResult
+   +getEmail(): String
+   +getName(): String
+   +getBirthdate(): String
+   +getLocation(): String
+   +getProfilePicture(): String
+   +getPersonalityType(): String
+   +getHobbies(): List<String>
+   +toString(): String
+   +builder(): Builder
+}
+
+class UpdateProfileActivityResult {
+    -UserModel userProfile
+
+    -UpdateProfileActivityResult(UserModel userProfile)
+
+    +getUserProfile(): UserModel
+    +toString(): String
+    +builder(): Builder
+}
+
+class UpdateProfileLambda {
+    UserModel userProfile
+    LambdaResponse handleRequest(AuthenticatedLambdaRequest<UpdateProfileActivityRequest>, Context)
+}
+
+class GetSimilarUsersActivity {
+    UserDao
+
+    handleRequest(GetSimilarUsersActivityRequest request): GetSimilarUsersActivityResult
+}
+
+class GetSimilarUsersActivityRequest {
+    -String personalityType
+    -List<String> hobbies
+
+    GetSimilarUsersActivityRequest(String personalityType, List<String> hobbies)
+
+    +getPersonalityType(): String
+    +getHobbies(): List<String>
+    +toString(): String
+    +builder(): Builder
+}
+
+class GetSimilarUsersActivityResult {
+    List<UserModel> similarUsers
+
+    -GetSimilarUsersActivityResult(List<UserModel> similarUsers)
+    +getUsers(): List<UserModel>
+    +toString(): String
+    +builder(): Builder
+
+}
+
+class GetSimilarUsersLambda {
+    List<UserModel> similarUsers
+
+    LambdaResponse handleRequest(AuthenticatedLambdaRequest<GetSimilarUsersActivityRequest>, Context)
+}
+
+class CreateNewMessageActivity {
+    -MessageDao
+
+    +CreateNewMessageActivity(MessageDao messageDao)
+    +handleRequest(CreateNewMessageActivityRequest request): CreateNewMessageActivityResult
+}
+
+class CreateNewMessageActivityRequest {
+    -String dateTimeSent
+    -String sentBy
+    -String receivedBy
+    -String messageContent
+    -boolean readStatus
+
+    CreateNewMessageActivityRequest(String, dateTimeSent, String sentBy, String receivedBy,
+                                    String messageContent, boolean readStatus)
+
+    +getDateTimeSent(): String
+    +getSender(): String
+    +getRecipient(): String
+    +getMessageContent(): String
+    +getReadStatus(): boolean
+    +toString(): String
+    +builder(): Builder
+}
+
+class CreateNewMessageActivityResult {
+    -MessageModel message
+
+    -CreateNewMessageActivityResult(MessageModel message)
+    +getMessage(): MessageModel
+    +toString(): String
+    +builder(): Builder
+}
+
+class CreateNewMessageLambda {
+    MessageModel message
+
+    LambdaResponse handleRequest(AuthenticatedLambdaRequest<CreateNewMessageActivityRequest>, Context)
+}
+
+class GetInboxMessagesActivity{
+    -MessageDao messageDao
+
+    +GetInboxMessagesActivity((MessageDao messageDao)
+    +handleRequest(GetInboxMessagesActivityRequest request): GetInboxMessagesActivityResult
+}
+
+class GetInboxMessagesActivityRequest {
+    -String sentBy
+    -String receivedBy
+
+    GetInboxMessagesActivityRequest(String sentBy, String receivedBy)
+
+    +getSender(): String
+    +getRecipient(): String
+}
+
+class GetInboxMessagesActivityResult {
+    -List<MessageModel> messages
+
+    +GetInboxMessagesActivityResult(String sentBy, String receivedBy)
+
+    +getMessages(): List<MessageModel>
+    +toString(): String
+    +builder(): Builder
+}
+
+class GetInboxMessagesLambda {
+    String sentBy
+    String receivedBy
+
+    LambdaResponse handleRequest(AuthenticatedLambdaRequest<GetInboxMessagesActivityRequest>, Context)
+}
+
+class DeleteMessagesActivity{
+    -MessageDao messageDao
+
+    +DeleteMessagesActivity((MessageDao messageDao)
+    +handleRequest(DeleteMessagesActivityRequest request): DeleteMessagesActivityResult
+}
+
+class DeleteMessagesActivityRequest {
+    -List<MessageModel> messages
+
+    GetInboxMessagesActivityRequest(List<MessageModel> messages)
+
+    +getMessages(): List<MessageModel>
+}
+
+class DeleteMessagesActivityResult {
+    List<MessageModel> messages
+
+    DeleteMessagesActivityResult(List<MessageModel> messages)
+
+    List<MessageModel> getMessages()
+    String toString()
+    Builder builder()
+}
+
+class DeleteMessagesLambda {
+    List<MessageModel> messages
+
+    LambdaResponse handleRequest(AuthenticatedLambdaRequest<DeleteMessagesActivityRequest>, Context)
+}
+@enduml
